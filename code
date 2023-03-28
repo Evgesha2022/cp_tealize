@@ -1,0 +1,187 @@
+#include <iostream>
+#include <map>
+#include <fstream>
+#include <string>
+#include <filesystem>
+#include<vector>
+#include <cstdio>
+#include <regex>
+#include <iostream>
+#include <sstream>
+using namespace std;
+std::vector<string> allfile;
+int prob = 0;
+string changeout(string outfile)
+{
+std::string begin = "C:\\Users\\Евгения\\source\\repos\\real_copy\\real_copy\\";
+    size_t sz = outfile.size();
+    char beg = '/';
+    const string news = "\\";
+    for (size_t i = 0; i < sz; ++i)
+    {
+        if (outfile[i] != beg)  continue;
+        else outfile.replace(i, 1, news);
+    }
+    outfile = begin + outfile;
+    return outfile;
+}
+
+int cpend(string  src, string  out)
+{
+    
+    string out_file = out;
+    
+    if (out_file.find('.') == 18446744073709551615) {
+        const int buf_size = 15638;
+        string src_file = src +" ";
+        string copy = "copy ";
+        out_file = changeout(out_file);
+        //const char  *comand = ;
+        system((copy + src_file + out_file).c_str());
+        return 0;
+    }
+    else {
+
+        if (prob == 90) out_file = out + "~";
+        else out_file = out;
+        const int buf_size = 15638;
+        string src_file;
+        src_file =src; 
+        
+
+        std::ifstream ifs(src_file.c_str(), std::ios::binary);
+
+        ifs.seekg(0, std::ios::end);
+        std::ios::pos_type src_size = ifs.tellg();
+        ifs.seekg(0, std::ios::beg);
+
+
+        size_t a_mount = src_size / buf_size;
+
+        size_t b_mount = src_size % buf_size;
+
+
+        std::ofstream ofs(out_file.c_str(), std::ios::binary);
+
+        char buf[buf_size];
+        for (size_t i = 0; i < a_mount; ++i)
+        {
+            ifs.read(buf, buf_size);
+            ofs.write(buf, buf_size);
+        }
+
+        if (b_mount != 0)
+        {
+            ifs.read(buf, b_mount);
+            ofs.write(buf, b_mount);
+        }
+
+        ifs.close();
+        ofs.close();
+        return 0;
+    }
+}
+int cp(string  src1, string  out1)
+{
+    if (src1 == out1) {
+        std::cout << "cp: " + src1 + " и " + out1
+            + " - один и тот же файл" << endl;
+        return 0;
+    }
+    else { cpend(src1, out1); return 0; }
+}
+std::vector<std::string> razbien(std::string str)
+{
+    
+
+    std::stringstream sstr{};
+    sstr << str;
+    std::vector<std::string> vec{};
+    {
+        std::string temp{};
+        while (sstr >> temp)
+        {
+            vec.push_back(std::move(temp));
+        }
+    }
+
+    return vec;
+}
+bool found(string file) {
+    for (auto i : allfile)
+    {
+        if (i == file)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+int main()
+{
+    setlocale(LC_ALL, "Russian");
+    ofstream f1("myfile.txt");	
+    f1 << "Hello, world";   
+    allfile.push_back("myfile.txt");
+    f1.close();            
+    string a= "~";
+    while (std::cout << "evgenia@astra:" + a + "$")
+    {
+        string req;
+        string ans , path , outfile; ;
+        std::cin >>ans>> req>>path>>outfile;
+       ans = ans+ " "+req;
+        
+        std::map <std::string, int> mapping;;
+        mapping["cp"] = 1;
+        mapping["cp -i"] = 2;
+        mapping["cp -b"] = 3;
+        mapping["cp -v"] = 4;
+
+        switch (mapping[ans]) {
+        case 1: {
+            allfile.push_back(outfile);
+            cp( path, outfile);
+            break;
+        }
+        case 2: {    
+            string ls;
+            bool sd = found(outfile);
+            if (sd == true) {
+                std::cout << "cp: перезаписать " + outfile + " ?";
+                std::cin >> ls;
+                if (ls == "y")
+                {
+                    cp(path, outfile);
+                }
+                else {
+                    break;
+                }
+            }
+            else { 
+                cp( path, outfile);  allfile.push_back(outfile);
+            }
+            
+            break;
+        }
+        case 3: { 
+            if (found(outfile) == true)
+            { 
+                prob = 90;
+                cp(path, outfile);
+                allfile.push_back(outfile + "~");
+            }
+            else {
+                cp(path, outfile);
+            }
+            
+            break; }
+        case 4:  {
+            allfile.push_back(path);
+            cp(path, outfile);
+            std::cout <<  path<< " -> " << outfile << endl;;
+            break;
+        }
+        };
+    }
+}
